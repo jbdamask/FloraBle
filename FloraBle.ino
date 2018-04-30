@@ -25,19 +25,19 @@ Adafruit_BluefruitLE_UART ble(BLUEFRUIT_HWSERIAL_NAME, BLUEFRUIT_UART_MODE_PIN);
     int lastButtonState = LOW;
     
     /* We'll cycle through event states on button pushes */
-    int lastState = 0;
-    int currentState = 1;
-    int minState = 0;
-    int maxState = 11;
+    uint8_t lastState = 0;
+    uint8_t currentState = 1;
+    uint8_t minState = 0;
+    uint8_t maxState = 11;
     // the packet buffer
     extern uint8_t packetbuffer[];
     // the ble payload, set to max buffer size
     uint8_t payload[21];
     // the defined length of our payload
     int colorLength = 4;
+    uint16_t colLen = 3;    
     // Payload stuff
     uint8_t xsum = 0;
-    uint16_t colLen = 3;
     // Button debouncing
     // the following variables are unsigned longs because the time, measured in
     // milliseconds, will quickly become a bigger number than can be stored in an int.
@@ -105,7 +105,7 @@ void loop()
     if(reading != buttonState){
       buttonState = reading;
       if(buttonState == LOW){
-        if (currentState < maxState+1)
+        if (currentState < maxState)
         {
           currentState = currentState + 1;
         }else{
@@ -127,8 +127,10 @@ void packAndSend()
   payload[0] = 0x21;
   payload[1] = 0x42;
   payload[2] = currentState;
+
   xsum = 0;
-  for (uint8_t i=0; i<colLen; i++) {
+  //for (uint8_t i=0; i<colLen; i++) {
+  for (uint8_t i=0; i<colorLength-1; i++) {
     xsum += payload[i];
   }
   xsum = ~xsum;    
